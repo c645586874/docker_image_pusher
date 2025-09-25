@@ -6,4 +6,4 @@ nginx
 #--platform=linux/arm64 xiaoyaliu/alist
 #homeassistant/home-assistant:latest
 #nodered/node-red:latest
-eclipse-mosquitto/mosquitto
+mosquitto
