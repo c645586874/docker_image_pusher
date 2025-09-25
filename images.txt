@@ -6,4 +6,5 @@ nginx
 #--platform=linux/arm64 xiaoyaliu/alist
 #homeassistant/home-assistant:latest
 #nodered/node-red:latest
-mosquitto
+https://github.com/c645586874/docker_image_pusher/blob/main/images.txt
+eclipse-mosquitto:latest
