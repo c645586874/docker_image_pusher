@@ -7,3 +7,4 @@ nginx
 #homeassistant/home-assistant:latest
 #nodered/node-red:latest
 eclipse-mosquitto:latest
+emqx/emqx:latest
