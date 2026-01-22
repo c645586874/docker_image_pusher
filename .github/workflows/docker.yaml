@@ -5,7 +5,6 @@ on:
   push:
     branches: [ main ]
 
-
 env:
   ALIYUN_REGISTRY: "${{ secrets.ALIYUN_REGISTRY }}"
   ALIYUN_NAME_SPACE: "${{ secrets.ALIYUN_NAME_SPACE }}"
@@ -29,7 +28,6 @@ jobs:
     - name: Maximize build space
       uses: easimon/maximize-build-space@master
       with:
-
         root-reserve-mb: 2048
         swap-size-mb: 128
         remove-dotnet: 'true'
@@ -38,6 +36,24 @@ jobs:
         # remove-android: 'true'
         # remove-codeql: 'true'
         build-mount-path: '/var/lib/docker/'
+
+    - name: Fix DNS for Docker Login
+      run: |
+        echo "Fix DNS configuration..."
+        # 备份原来的 resolv.conf
+        sudo cp /etc/resolv.conf /etc/resolv.conf.backup
+        
+        # 设置可靠的 DNS 服务器，解决 'server misbehaving' 错误
+        cat <<EOF | sudo tee /etc/resolv.conf
+        nameserver 8.8.8.8
+        nameserver 8.8.4.4
+        nameserver 223.5.5.5
+        options edns0
+        EOF
+        
+        # 验证 DNS 解析
+        echo "Testing DNS resolution for ${{ secrets.ALIYUN_REGISTRY }}..."
+        nslookup ${{ secrets.ALIYUN_REGISTRY }} || echo "DNS test completed"
 
     - name: Restart docker
       run: sudo service docker restart
@@ -55,9 +71,44 @@ jobs:
     - name: Docker Setup Buildx
       uses: docker/setup-buildx-action@v3
 
-    - name: Build and push image Aliyun
+    - name: Login to Aliyun Container Registry
+      env:
+        ALIYUN_REGISTRY: "${{ secrets.ALIYUN_REGISTRY }}"
+        ALIYUN_REGISTRY_USER: "${{ secrets.ALIYUN_REGISTRY_USER }}"
+        ALIYUN_REGISTRY_PASSWORD: "${{ secrets.ALIYUN_REGISTRY_PASSWORD }}"
       run: |
-        docker login -u $ALIYUN_REGISTRY_USER -p $ALIYUN_REGISTRY_PASSWORD $ALIYUN_REGISTRY
+        echo "Logging into Aliyun Container Registry..."
+        
+        # 等待 DNS 生效
+        sleep 3
+        
+        # 使用更安全的密码输入方式，避免警告
+        echo "$ALIYUN_REGISTRY_PASSWORD" | docker login \
+          -u "$ALIYUN_REGISTRY_USER" \
+          --password-stdin \
+          "$ALIYUN_REGISTRY"
+        
+        echo "Login successful!"
+
+    - name: Build and push image Aliyun
+      env:
+        ALIYUN_REGISTRY: "${{ secrets.ALIYUN_REGISTRY }}"
+        ALIYUN_NAME_SPACE: "${{ secrets.ALIYUN_NAME_SPACE }}"
+        ALIYUN_REGISTRY_USER: "${{ secrets.ALIYUN_REGISTRY_USER }}"
+        ALIYUN_REGISTRY_PASSWORD: "${{ secrets.ALIYUN_REGISTRY_PASSWORD }}"
+      run: |
+        # 确保 Docker 已经登录
+        docker system info | grep "Username" || echo "Docker not logged in, trying to login..."
+        
+        # 如果未登录，重新登录
+        if ! docker system info | grep -q "Username"; then
+          echo "Re-login to Aliyun Container Registry..."
+          echo "$ALIYUN_REGISTRY_PASSWORD" | docker login \
+            -u "$ALIYUN_REGISTRY_USER" \
+            --password-stdin \
+            "$ALIYUN_REGISTRY"
+        fi
+        
         # 数据预处理,判断镜像是否重名
         declare -A duplicate_images
         declare -A temp_map
