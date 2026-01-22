@@ -1,8 +1,14 @@
 nginx
 #支持私库
 #k8s.gcr.io/kube-state-metrics/kube-state-metrics:v2.0.0
-#xhofe/alist:latest
+xhofe/alist:latest
+
 #支持指定架构
+#ALIYUN_NAME_SPACE                                blueseven
+#用户名（ALIYUN_REGISTRY_USER）           c645586874
+#密码（ALIYUN_REGISTRY_PASSWORD）   csj19940909
+#仓库地址（ALIYUN_REGISTRY）             //
+
 #--platform=linux/arm64 xiaoyaliu/alist
 #homeassistant/home-assistant:latest
 #nodered/node-red:latest
