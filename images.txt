@@ -8,3 +8,4 @@ nginx
 #nodered/node-red:latest
 eclipse-mosquitto:latest
 emqx/emqx:latest
+xhofe alist:latest
