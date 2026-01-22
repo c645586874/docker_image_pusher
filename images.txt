@@ -1,15 +1,14 @@
 nginx
 #支持私库
 #k8s.gcr.io/kube-state-metrics/kube-state-metrics:v2.0.0
-xhofe/alist:最新
+xhofe/alist
 #支持指定架构
-#阿里云命名空间                                蓝色七号
+#阿里云命名空间                                
 #用户名（ALIYUN_REGISTRY_USER） c645586874
 # 密码（ALIYUN_REGISTRY_PASSWORD）   csj19940909
 #仓库地址（ALIYUN_REGISTRY）
-#--平台=linux/arm64 小刘/alist
-#homeassistant/home-assistant:最新
-#nodered/node-red:最新版本
-eclipse-mosquitto:最新
-emqx/emqx:最新
-alist:最新
+#homeassistant/home-assistant
+#nodered/node-red
+eclipse-mosquitto
+emqx/emqx
+alist
